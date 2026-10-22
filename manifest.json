@@ -1,16 +1,20 @@
 {
+  "id": "yewon-baby-food-tracker",
   "name": "예워니 맘마기록",
   "short_name": "예워니맘마",
   "description": "조카 예원이 전용 이유식 스케줄러 & 식단 일지",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#FFFBF7",
   "theme_color": "#FF8A65",
   "icons": [
     {
       "src": "sample/ye.jpg",
       "sizes": "192x192 512x512",
-      "type": "image/jpeg"
+      "type": "image/jpeg",
+      "purpose": "any maskable"
     }
   ]
 }

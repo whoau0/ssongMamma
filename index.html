@@ -6,6 +6,14 @@
   <title>예워니 맘마기록 - 조카 전용 이유식 다이어리</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#FF8A65">
+  
+  <!-- 모바일 독립 실행형 앱 (PWA Standalone - 주소창 및 툴바 숨김) -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="예워니맘마">
+  <link rel="apple-touch-icon" href="sample/ye.jpg">
+  
   <!-- Google Fonts: Pretendard 대체 및 Noto Sans KR -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -427,5 +435,16 @@
   <script src="supabase-client.js"></script>
   <script src="export.js"></script>
   <script src="app.js"></script>
+
+  <!-- PWA Service Worker 등록 -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(() => console.log('✅ PWA Service Worker 등록 완료'))
+          .catch((err) => console.warn('PWA 등록 실패:', err));
+      });
+    }
+  </script>
 </body>
 </html>
