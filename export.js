@@ -238,7 +238,7 @@ const Exporter = (function () {
       <div class="print-page">
         <div class="print-header">
           <h1>🏥 [소아청소년과 진료 참고용] 예원이 이유식 및 알러지 반응 경과 보고서</h1>
-          <p class="print-meta">출력일자: ${todayStr} | 환아: 조카 예원 (D+${records[0]?.dDayCount || 183}일 기준)</p>
+          <p class="print-meta">출력일자: ${todayStr} | 환아: 조카 예원 (출생: 2026.05.11 / D+${records[0]?.dDayCount || 165}일 기준)</p>
         </div>
 
         <div class="print-summary-box">

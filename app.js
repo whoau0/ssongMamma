@@ -4,10 +4,10 @@
  */
 
 // ==========================================
-// 상수 및 기본 설정
+// 상수 및 기본 설정 (예원이 실제 출생일: 2026년 5월 11일)
 // ==========================================
 const STORAGE_KEY = 'yewon_meal_records_v1';
-const BIRTH_DATE_ESTIMATE = '2026-04-22'; // D+183일 기준 가상 예원이 출생일
+const BIRTH_DATE = '2026-05-11'; // 예원이 출생일
 
 // 현재 앱 상태
 const state = {
@@ -74,12 +74,14 @@ function getTodayString() {
 function calculateDDay(dateStr) {
   try {
     const target = new Date(dateStr);
-    const birth = new Date(BIRTH_DATE_ESTIMATE);
+    const birth = new Date(BIRTH_DATE);
+    target.setHours(0, 0, 0, 0);
+    birth.setHours(0, 0, 0, 0);
     const diffTime = target.getTime() - birth.getTime();
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays > 0 ? diffDays : 183;
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1; // 출생 당일 = D+1일 기준
+    return diffDays > 0 ? diffDays : 1;
   } catch {
-    return 183;
+    return 165;
   }
 }
 
@@ -836,7 +838,7 @@ const SAMPLE_RECORDS = [
     id: 'sample_01',
     stage: 'EARLY',
     recordDate: '2026-10-22',
-    dDayCount: 183,
+    dDayCount: 165,
     newIngredient: '오이',
     mealName: '소고기오이미음',
     mealBrand: '베이비본죽',
@@ -855,7 +857,7 @@ const SAMPLE_RECORDS = [
     id: 'sample_02',
     stage: 'EARLY',
     recordDate: '2026-10-21',
-    dDayCount: 182,
+    dDayCount: 164,
     newIngredient: '단호박',
     mealName: '소고기단호박미음',
     mealBrand: '베이비본죽',
@@ -874,7 +876,7 @@ const SAMPLE_RECORDS = [
     id: 'sample_03',
     stage: 'EARLY',
     recordDate: '2026-10-20',
-    dDayCount: 181,
+    dDayCount: 163,
     newIngredient: '소고기',
     mealName: '소고기미음',
     mealBrand: '베베쿡',
@@ -893,7 +895,7 @@ const SAMPLE_RECORDS = [
     id: 'sample_04',
     stage: 'EARLY',
     recordDate: '2026-10-18',
-    dDayCount: 179,
+    dDayCount: 161,
     newIngredient: '쌀',
     mealName: '초기 쌀미음',
     mealBrand: '직접 조리 (엄마표)',
