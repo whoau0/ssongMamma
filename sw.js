@@ -1,5 +1,5 @@
 // 예워니 맘마기록 - PWA Service Worker (오프라인 지원 & 독립 실행형 앱)
-const CACHE_NAME = 'yewon-mamma-v3';
+const CACHE_NAME = 'yewon-mamma-v4';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

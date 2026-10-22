@@ -22,7 +22,7 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- Supabase JS Client CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link rel="stylesheet" href="style.css?v=20261022_02">
+  <link rel="stylesheet" href="style.css?v=20261022_03">
 </head>
 <body>
   <div class="app-container">
@@ -130,13 +130,13 @@
             <input type="hidden" id="editRecordId" value="">
 
             <!-- 날짜 & D+일수 섹션 -->
-            <div class="form-card date-dday-card">
-              <div class="date-dday-grid">
-                <div class="form-group date-col">
+            <div class="form-card">
+              <div class="form-row-2">
+                <div class="form-group">
                   <label for="recordDate">📅 이유식 날짜 <span class="required">*</span></label>
-                  <input type="date" id="recordDate" class="input-control date-picker-control" required>
+                  <input type="date" id="recordDate" class="input-control" required>
                 </div>
-                <div class="form-group dday-col">
+                <div class="form-group">
                   <label for="dDayCount">🎂 경과일</label>
                   <div class="dday-pill-wrap">
                     <span class="dday-pill-prefix">D+</span>
@@ -431,16 +431,16 @@
     </div>
   </div>
 
-  <script src="schema.js?v=20261022_02"></script>
-  <script src="supabase-client.js?v=20261022_02"></script>
-  <script src="export.js?v=20261022_02"></script>
-  <script src="app.js?v=20261022_02"></script>
+  <script src="schema.js?v=20261022_03"></script>
+  <script src="supabase-client.js?v=20261022_03"></script>
+  <script src="export.js?v=20261022_03"></script>
+  <script src="app.js?v=20261022_03"></script>
 
   <!-- PWA Service Worker 등록 -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js?v=20261022_02')
+        navigator.serviceWorker.register('./sw.js?v=20261022_03')
           .then((reg) => {
             reg.update(); // 최신 서비스 워커 즉시 업데이트 강제
             console.log('✅ PWA Service Worker 등록 및 업데이트 완료');
