@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>예워니 맘마기록 - 조카 전용 이유식 다이어리</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#FF8A65">
+  <!-- Google Fonts: Pretendard 대체 및 Noto Sans KR -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&family=Gaegu:wght@400;700&display=swap" rel="stylesheet">
+  <!-- SheetJS (Excel .xlsx 내보내기용) -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- Supabase JS Client CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- ============================================ -->
+    <!-- Screen 1: 인트로 / 홈 화면 (Home / Splash)   -->
+    <!-- ============================================ -->
+    <section id="screen-home" class="screen active">
+      <div class="home-content">
+        <div class="home-badge">🌸 사랑스러운 조카 예원이를 위한</div>
+        <h1 class="home-title">예워니<br><span class="highlight">맘마기록</span></h1>
+        <p class="home-subtitle">매일매일 건강하고 쑥쑥 자라나는 이유식 일지</p>
+
+        <!-- HOME-01: 대표 사진 프레임 -->
+        <div class="baby-photo-frame">
+          <div class="photo-glow"></div>
+          <img src="sample/ye.jpg" alt="예원이 사진" class="baby-photo" id="homeBabyImg" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'240\' height=\'240\' viewBox=\'0 0 240 240\'><rect fill=\'%23FFE8DC\' width=\'240\' height=\'240\'/><text fill=\'%23FF8A65\' font-size=\'48\' x=\'50%25\' y=\'50%25\' text-anchor=\'middle\' dominant-baseline=\'central\'>👶 예원</text></svg>';">
+          <div class="photo-decor heart-1">💖</div>
+          <div class="photo-decor heart-2">🍼</div>
+          <div class="photo-decor heart-3">✨</div>
+        </div>
+
+        <div class="home-quick-stat" id="homeQuickStat">
+          <div class="stat-pill">
+            <span class="stat-label">예원이와 함께한 지</span>
+            <span class="stat-value" id="homeDDayText">D+183일</span>
+          </div>
+        </div>
+
+        <!-- HOME-03: 시작 버튼 -->
+        <div class="home-action">
+          <button id="btnStartApp" class="btn-primary btn-large pulse-btn">
+            <span>맘마 기록 시작하기</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================ -->
+    <!-- Screen 2: 메인 작업 대시보드                -->
+    <!-- ============================================ -->
+    <div id="screen-main" class="screen">
+      <!-- 4.2. 상단 글로벌 네비게이션 -->
+      <header class="app-header">
+        <div class="header-top">
+          <button id="btnHeaderHome" class="icon-btn" title="홈 화면으로" aria-label="홈으로">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </button>
+          <div class="header-title">
+            <img src="sample/ye.jpg" class="header-avatar" alt="예원" onerror="this.style.display='none'">
+            <span>예워니 맘마기록</span>
+            <span class="cloud-sync-status" id="cloudSyncStatus" title="Supabase 클라우드 실시간 동기화 활성화">☁️</span>
+          </div>
+          <div class="header-right-actions">
+            <button id="btnDirectExcel" class="text-pill-btn excel-pill" title="엑셀(.xlsx) 파일 즉시 다운로드">
+              📊 엑셀 다운
+            </button>
+            <button id="btnExportModal" class="text-pill-btn export-pill" title="진료용 출력 및 백업 관리">
+              📋 진료/백업
+            </button>
+            <button id="btnSampleData" class="text-pill-btn" title="예시 데이터 채우기">샘플</button>
+          </div>
+        </div>
+
+        <!-- 화면 모드 전환 세그먼트 (기록 | 전체보기) -->
+        <div class="segment-tabs">
+          <button class="segment-tab active" data-tab="record">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            <span>기록하기</span>
+          </button>
+          <button class="segment-tab" data-tab="history">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/></svg>
+            <span>전체보기</span>
+            <span class="badge-count" id="historyCountBadge">0</span>
+          </button>
+        </div>
+
+        <!-- 이유식 단계 선택 (Stage Selector) -->
+        <div class="stage-selector-container">
+          <div class="stage-label">단계 선택:</div>
+          <div class="stage-chips" id="stageChips">
+            <button class="stage-chip active" data-stage="EARLY">
+              <span class="chip-title">초기</span>
+              <span class="chip-desc">5~6개월</span>
+            </button>
+            <button class="stage-chip" data-stage="MID">
+              <span class="chip-title">중기</span>
+              <span class="chip-desc">7~8개월</span>
+            </button>
+            <button class="stage-chip" data-stage="LATE">
+              <span class="chip-title">후기</span>
+              <span class="chip-desc">9~11개월</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- 본문 스크롤 영역 -->
+      <main class="app-main-content">
+        <!-- ============================================ -->
+        <!-- 4.3. [기록하기] 화면 (Record View)          -->
+        <!-- ============================================ -->
+        <section id="tab-record" class="tab-view active">
+          <form id="recordForm" class="record-form">
+            <input type="hidden" id="editRecordId" value="">
+
+            <!-- 날짜 & D+일수 섹션 -->
+            <div class="form-card">
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label for="recordDate">📅 날짜 <span class="required">*</span></label>
+                  <input type="date" id="recordDate" class="input-control" required>
+                </div>
+                <div class="form-group">
+                  <label for="dDayCount">🎂 경과일 (D+)</label>
+                  <div class="dday-input-wrap">
+                    <span class="dday-prefix">D+</span>
+                    <input type="number" id="dDayCount" class="input-control" placeholder="183" min="0">
+                    <span class="dday-unit">일</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 신규 식재료 (처음 먹은 것) -->
+            <div class="form-card">
+              <div class="form-group">
+                <div class="label-with-tip">
+                  <label for="newIngredient">🌟 처음 먹은 것 <span class="badge-new-label">NEW</span></label>
+                  <span class="tip-text">새로운 알러지 유발 가능 식재료 추적</span>
+                </div>
+                <div class="input-with-tags">
+                  <input type="text" id="newIngredient" class="input-control" placeholder="예: 소고기, 계란 노른자, 오이 (공란 가능)">
+                </div>
+                <div class="quick-tags">
+                  <span class="quick-tag-label">추천 큐:</span>
+                  <button type="button" class="quick-chip" data-val="한우소고기">한우소고기</button>
+                  <button type="button" class="quick-chip" data-val="계란노른자">계란노른자</button>
+                  <button type="button" class="quick-chip" data-val="오이">오이</button>
+                  <button type="button" class="quick-chip" data-val="단호박">단호박</button>
+                  <button type="button" class="quick-chip" data-val="사과">사과</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 이유식 및 토핑 정보 -->
+            <div class="form-card">
+              <div class="form-group">
+                <label for="mealName">🥣 이유식 명칭 <span class="required">*</span></label>
+                <input type="text" id="mealName" class="input-control" placeholder="예: 쌀미음, 쇠고기애호박미음" required>
+              </div>
+
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label for="mealBrand">🏢 이유식 업체</label>
+                  <div class="select-or-input">
+                    <select id="mealBrandSelect" class="input-control">
+                      <option value="직접 조리 (엄마표)">직접 조리 (엄마/이모표)</option>
+                      <option value="베베쿡">베베쿡</option>
+                      <option value="베이비본죽" selected>베이비본죽</option>
+                      <option value="얌이밀">얌이밀</option>
+                      <option value="짱죽">짱죽</option>
+                      <option value="팜투베이비">팜투베이비</option>
+                      <option value="custom">직접 입력...</option>
+                    </select>
+                    <input type="text" id="mealBrandCustom" class="input-control hide" placeholder="업체명 직접 입력">
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="nursingAmountMl">🍼 수유량 (ml)</label>
+                  <div class="stepper-wrap">
+                    <input type="number" id="nursingAmountMl" class="input-control" value="160" min="0" step="10">
+                    <span class="unit-text">ml</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label for="toppingName">🍓 토핑 재료</label>
+                  <input type="text" id="toppingName" class="input-control" placeholder="예: 한우 10g, 계란 3g">
+                </div>
+                <div class="form-group">
+                  <label for="toppingBrand">🏬 토핑 업체</label>
+                  <input type="text" id="toppingBrand" class="input-control" placeholder="예: 베이비본죽, 홈메이드">
+                </div>
+              </div>
+            </div>
+
+            <!-- 이유식 총량 및 5분할 게이지 바 -->
+            <div class="form-card highlight-card">
+              <div class="card-header-flex">
+                <label for="totalPreparedGram" class="card-main-label">
+                  ⚖️ 준비한 이유식 총량 <span class="required">*</span>
+                </label>
+                <div class="gram-input-inline">
+                  <input type="number" id="totalPreparedGram" class="input-control-sm" value="50" min="10" max="300" step="5" required>
+                  <span class="unit-text">g</span>
+                </div>
+              </div>
+
+              <!-- 💡 먹은 양 5분할 바 인터랙션 UI -->
+              <div class="gauge-section">
+                <div class="gauge-title-row">
+                  <span class="gauge-label">🥄 먹은 양 터치 선택 (5분할 게이지)</span>
+                  <span class="gauge-percent" id="eatenPercentText">80% (4칸)</span>
+                </div>
+
+                <div class="five-bar-container" id="fiveBarContainer">
+                  <button type="button" class="bar-block filled" data-level="1" title="1칸 20%">
+                    <span class="block-num">1</span>
+                    <span class="block-ratio">20%</span>
+                  </button>
+                  <button type="button" class="bar-block filled" data-level="2" title="2칸 40%">
+                    <span class="block-num">2</span>
+                    <span class="block-ratio">40%</span>
+                  </button>
+                  <button type="button" class="bar-block filled" data-level="3" title="3칸 60%">
+                    <span class="block-num">3</span>
+                    <span class="block-ratio">60%</span>
+                  </button>
+                  <button type="button" class="bar-block filled" data-level="4" title="4칸 80%">
+                    <span class="block-num">4</span>
+                    <span class="block-ratio">80%</span>
+                  </button>
+                  <button type="button" class="bar-block" data-level="5" title="5칸 100% 완밥">
+                    <span class="block-num">5</span>
+                    <span class="block-ratio">100% 완밥</span>
+                  </button>
+                </div>
+
+                <!-- 0칸(거부) 및 리셋 버튼 -->
+                <div class="gauge-auxiliary-row">
+                  <button type="button" id="btnZeroEaten" class="aux-btn">0칸 (거부/0g)</button>
+                  <div class="gauge-result-badge" id="gaugeResultSummary">
+                    총 <strong>50g</strong> 중 <strong>40g</strong> 섭취
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 알러지 경고 토글 및 상세 증상 -->
+            <div class="form-card allergy-form-card" id="allergyCard">
+              <div class="allergy-toggle-row">
+                <div class="allergy-label-group">
+                  <span class="allergy-icon">⚠️</span>
+                  <div>
+                    <div class="allergy-main-text">알러지 이상 징후 발생</div>
+                    <div class="allergy-sub-text">피부 발진, 두드러기, 구토, 설사 등</div>
+                  </div>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="hasAllergy">
+                  <span class="slider round"></span>
+                </label>
+              </div>
+
+              <!-- 알러지 활성화 시 열리는 증상 입력 필드 -->
+              <div class="allergy-detail-panel hide" id="allergyDetailPanel">
+                <label for="allergySymptom" class="allergy-field-label">🚨 상세 증상 및 부위 메모 <span class="required">*</span></label>
+                <input type="text" id="allergySymptom" class="input-control allergy-input" placeholder="예: 입 주변 및 볼에 붉은 반점 올라옴, 가려워함">
+                <div class="symptom-quick-chips">
+                  <button type="button" class="symptom-chip" data-symptom="입 주변 붉은 발진">입 주변 붉은 발진</button>
+                  <button type="button" class="symptom-chip" data-symptom="얼굴 및 목 두드러기">얼굴/목 두드러기</button>
+                  <button type="button" class="symptom-chip" data-symptom="약간의 구토 증상">구토</button>
+                  <button type="button" class="symptom-chip" data-symptom="묽은 설사 발생">설사</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 특이사항 및 메모 -->
+            <div class="form-card">
+              <div class="form-group">
+                <label for="recordMemo">📝 특이사항 및 엄마/이모 메모</label>
+                <textarea id="recordMemo" class="input-control" rows="3" placeholder="예: 오늘은 컨디션이 좋아 기분 좋게 냠냠 잘 받아먹음. 배변 상태 황금변."></textarea>
+              </div>
+            </div>
+
+            <!-- 액션 버튼 -->
+            <div class="form-actions">
+              <button type="button" id="btnCancelEdit" class="btn-secondary hide">수정 취소</button>
+              <button type="submit" id="btnSaveRecord" class="btn-primary btn-large">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span id="saveBtnText">오늘의 맘마 저장하기</span>
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- 4.4. [전체보기] 화면: 달력 캘린더 중심 뷰    -->
+        <!-- ============================================ -->
+        <section id="tab-history" class="tab-view">
+          <!-- 히스토리 상단 통계 & 뷰 토글 -->
+          <div class="history-controls">
+            <div class="calendar-nav-bar">
+              <button id="btnPrevMonth" class="icon-nav-btn" title="이전 달">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              <div class="calendar-current-label" id="calendarCurrentLabel">2026년 10월</div>
+              <button id="btnNextMonth" class="icon-nav-btn" title="다음 달">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+              <button id="btnTodayCalendar" class="today-chip-btn">오늘</button>
+            </div>
+
+            <!-- 범례 (Legend) -->
+            <div class="calendar-legend">
+              <span class="legend-item"><span class="legend-dot completed-dot"></span> 이유식 완료</span>
+              <span class="legend-item"><span class="legend-dot nursing-dot"></span> 수유량</span>
+              <span class="legend-item"><span class="legend-dot new-dot"></span> NEW</span>
+              <span class="legend-item"><span class="legend-dot allergy-dot"></span> ⚠️ 알러지</span>
+            </div>
+          </div>
+
+          <!-- 📅 월간 달력 그리드 -->
+          <div class="calendar-card">
+            <!-- 요일 헤더 -->
+            <div class="calendar-weekdays">
+              <div class="weekday sun">일</div>
+              <div class="weekday">월</div>
+              <div class="weekday">화</div>
+              <div class="weekday">수</div>
+              <div class="weekday">목</div>
+              <div class="weekday">금</div>
+              <div class="weekday sat">토</div>
+            </div>
+            <!-- 날짜 그리드 (자바스크립트 생성) -->
+            <div class="calendar-days" id="calendarDaysGrid"></div>
+          </div>
+
+          <!-- 🔍 선택한 날짜 상세 영역 -->
+          <div class="selected-date-section">
+            <div class="selected-date-header">
+              <div class="selected-date-title" id="selectedDateTitle">
+                📅 <span>10월 22일</span> 상세 기록
+              </div>
+              <button id="btnAddRecordForDate" class="btn-date-add" title="이 날짜에 새 기록 추가">
+                + 이 날짜에 기록
+              </button>
+            </div>
+
+            <!-- 선택 날짜 카드 목록 컨테이너 -->
+            <div id="selectedDateCardContainer" class="selected-cards-wrap">
+              <!-- JS 동적 렌더링 -->
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- 토스트 알림 메시지 -->
+    <div id="toastMessage" class="toast hide"></div>
+
+    <!-- ============================================ -->
+    <!-- PRD 섹션 6: 소아과 진료 및 내보내기 모달       -->
+    <!-- ============================================ -->
+    <div id="exportModal" class="modal-overlay hide">
+      <div class="modal-sheet">
+        <div class="modal-header">
+          <h3>📋 데이터 관리 &amp; 소아과 진료 리포트</h3>
+          <button id="btnCloseExportModal" class="icon-btn close-modal-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-desc">
+            이유식 기록을 소아과 진료 시 의사 선생님께 보여주거나, 엑셀로 백업할 수 있습니다.
+          </p>
+
+          <div class="export-menu-list">
+            <button id="btnPrintClinic" class="export-menu-item highlight-item">
+              <div class="menu-icon">🏥</div>
+              <div class="menu-text">
+                <div class="menu-title">소아과 진료용 리포트 인쇄 (PDF 저장)</div>
+                <div class="menu-sub">알러지 반응 내역과 식단 요약본을 깔끔한 A4 서식으로 출력합니다.</div>
+              </div>
+            </button>
+
+            <button id="btnExportCsv" class="export-menu-item">
+              <div class="menu-icon">📊</div>
+              <div class="menu-text">
+                <div class="menu-title">엑셀(.xlsx) 파일 다운로드</div>
+                <div class="menu-sub">마이크로소프트 엑셀에서 바로 열 수 있는 정식 엑셀 파일로 저장합니다.</div>
+              </div>
+            </button>
+
+            <button id="btnExportJson" class="export-menu-item">
+              <div class="menu-icon">💾</div>
+              <div class="menu-text">
+                <div class="menu-title">전체 데이터 백업 (JSON)</div>
+                <div class="menu-sub">모든 식단 데이터를 파일로 안전하게 백업합니다.</div>
+              </div>
+            </button>
+
+            <label class="export-menu-item import-label">
+              <div class="menu-icon">📥</div>
+              <div class="menu-text">
+                <div class="menu-title">백업 데이터 복원 (JSON 가져오기)</div>
+                <div class="menu-sub">기존 백업 파일(.json)을 불러와 기록을 복원합니다.</div>
+              </div>
+              <input type="file" id="importJsonFileInput" accept=".json" class="hide">
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="schema.js"></script>
+  <script src="supabase-client.js"></script>
+  <script src="export.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
